@@ -12,6 +12,7 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
@@ -33,11 +34,13 @@ Execute command in loop
 
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
 import org.firstinspires.ftc.teamcode.mechanisms.Constants;
 
 @Autonomous
@@ -49,6 +52,8 @@ public class CommandTest extends OpMode {
     private final Pose startPose = poseFactory.of(24, 24, 0);
     private final Pose scorePose = poseFactory.of(48, 48, 90);
     private final Pose parkPose = poseFactory.of(72, 48, 90);
+
+    private DcMotorEx intakeMotor1;
 
     // Path methods
     private Path startToScore() {
@@ -67,9 +72,36 @@ public class CommandTest extends OpMode {
         );
     }
 
+    /*
+        intakeMotor1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        intakeMotor1.setTargetPosition(100);
+        intakeMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        intakeMotor1.setVelocity(100);
+     */
+
+    private final Command intakeMotorSet = Command.build()
+            .setStart(() -> {
+                intakeMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                intakeMotor1.setTargetPosition(20000);
+                intakeMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }).setExecute(() ->{
+                intakeMotor1.setVelocity(2800);
+            }).setDone(() ->
+                !intakeMotor1.isBusy()
+            ).setEnd(endCondition -> {
+                intakeMotor1.setPower(0);
+            });
+
+
+
     @Override
     public void init() {
         Scheduler.reset();
+        intakeMotor1 = hardwareMap.get(DcMotorEx.class, "intake1");
+        intakeMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+
 
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
@@ -78,7 +110,7 @@ public class CommandTest extends OpMode {
 
     @Override
     public void start() {
-        schedule(autoRoutine());
+        schedule(intakeMotorSet);
     }
 
     @Override

@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
 
+import com.pedropathing.algorithm.Foresight;
 import com.pedropathing.algorithm.ForesightConfig;
 import com.pedropathing.controllers.Controller;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.math.Matrix;
 import com.pedropathing.math.Vector2D;
+import com.pedropathing.revhub.drivetrains.Mecanum;
 import com.pedropathing.revhub.drivetrains.MecanumConfig;
 import com.pedropathing.revhub.localizers.PinpointConfig;
+import com.pedropathing.revhub.localizers.PinpointLocalizer;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -18,8 +22,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
 
 
-    public static Follower create(HardwareMap h){
-        return null;
+    // Each follower variable must be turned into the class, because those classes are implemented in the type needed
+    // We need to create the object with its specific configuration
+    //    com.pedropathing.localization.Localizer localizer,
+    //    com.pedropathing.drivetrain.Drivetrain drivetrain,
+    //    com.pedropathing.algorithm.Algorithm algorithm
+    public static Follower create(HardwareMap h) {
+        return new Follower(
+                new PinpointLocalizer(h, localizerConfig),
+                new Mecanum(h, drivetrainConfig),
+                new Foresight(foresightConfig)
+        );
     }
 
     public static MecanumConfig drivetrainConfig = new MecanumConfig(c -> {
