@@ -12,6 +12,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -30,7 +31,6 @@ Detecting a cluster allows for accurate localization.
  */
 
 
-
 public class Camera {
 
     private static AprilTagProcessor aprilTag;
@@ -46,8 +46,8 @@ public class Camera {
         visionPortal = VisionPortal.easyCreateWithDefaults(
                 hardwareMap.get(WebcamName.class, cameraName)
         );
-        useTelemetry=useTelemetry;
-        telemetry=telemetry;
+        useTelemetry = useTelemetry;
+        telemetry = telemetry;
 
 
     }
@@ -90,7 +90,7 @@ public class Camera {
                 detected_tags.add(clusterDet.metadata.name);
 
                 // Adding the cluster name to
-                if (useTelemetry){
+                if (useTelemetry) {
                     // Tag clusters have specific names, not id's.
                     telemetry.addData("====== Tag Cluster", clusterDet.metadata.name);
                     // Percent tags found is to determine if anything is blocking the tags
@@ -107,7 +107,24 @@ public class Camera {
         return Optional.of(detected_tags);
     }
 
-    public static boolean isScorable(){
+    public static Optional<AprilTagClusterDetection> get(String name) {
+        List<AprilTagDetection> detections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : detections) {
+            if (detection instanceof AprilTagClusterDetection) {
+                AprilTagClusterDetection cluster_detection = (AprilTagClusterDetection) detection;
+                // first_string.equals(other_string) checks if the values of both string match
+                // String == other_string checks if they are both the same variable
+                // So we must use .equals for String comparisons
+                if (name.equals(cluster_detection.metadata.name)) {
+                    return Optional.of(cluster_detection);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static boolean isScorable() {
 
         // TODO Use this link to check the orientation of the hive https://ftc-docs.firstinspires.org/en/latest/tech_tips/tech-tips/tech-tip-apriltag-clusters/tech-tip-apriltag-clusters.html
         return false;
