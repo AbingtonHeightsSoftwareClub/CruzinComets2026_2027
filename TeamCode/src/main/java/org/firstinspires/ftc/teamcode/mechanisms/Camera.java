@@ -108,6 +108,10 @@ public class Camera {
     }
 
     public static Optional<AprilTagClusterDetection> get(String name) {
+        if (name == null) {
+            return Optional.empty();
+        }
+
         List<AprilTagDetection> detections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : detections) {
@@ -116,7 +120,8 @@ public class Camera {
                 // first_string.equals(other_string) checks if the values of both string match
                 // String == other_string checks if they are both the same variable
                 // So we must use .equals for String comparisons
-                if (name.equals(cluster_detection.metadata.name)) {
+                if (cluster_detection.metadata != null &&
+                        (name.equals(cluster_detection.metadata.name) || name.equals(cluster_detection.metadata.shortName))) {
                     return Optional.of(cluster_detection);
                 }
             }
